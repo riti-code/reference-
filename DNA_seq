@@ -1,0 +1,47 @@
+# Create and activate environment
+conda create -n bioenv -y
+conda activate bioenv
+
+# Install tools
+conda install -c bioconda fastqc trimmomatic bwa samtools bcftools -y
+
+# Make working directory
+mkdir -p dna_work
+cd dna_work
+
+# 1. Quality check
+fastqc sample_R1.fastq.gz sample_R2.fastq.gz
+
+# 2. Trimming
+trimmomatic PE -phred33 \
+sample_R1.fastq.gz sample_R2.fastq.gz \
+sample_R1.trim.fastq.gz sample_R1.unpaired.fastq.gz \
+sample_R2.trim.fastq.gz sample_R2.unpaired.fastq.gz \
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 \
+LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+
+# 3. Post-trim quality check
+fastqc sample_R1.trim.fastq.gz sample_R2.trim.fastq.gz
+
+# 4. Index reference genome
+bwa index ref.fa
+samtools faidx ref.fa
+
+# 5. Align reads
+bwa mem ref.fa sample_R1.trim.fastq.gz sample_R2.trim.fastq.gz > aligned.sam
+
+# 6. Convert SAM to BAM
+samtools view -bS aligned.sam > aligned.bam
+
+# 7. Sort BAM
+samtools sort aligned.bam -o aligned.sorted.bam
+
+# 8. Index BAM
+samtools index aligned.sorted.bam
+
+# 9. Variant calling
+bcftools mpileup -f ref.fa aligned.sorted.bam -Ob -o variants.bcf
+bcftools call -mv -Ob -o variants.called.bcf variants.bcf
+
+# 10. Convert to VCF
+bcftools view variants.called.bcf > variants.vcf
