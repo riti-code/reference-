@@ -1,0 +1,29 @@
+<!-- forminsert.php — form + insert logic in ONE file -->
+<?php
+include_once 'connection.php';
+if (isset($_POST['submit'])) {
+    $Dep_no   = $_POST['Dep_no'];
+    $Dep_name = $_POST['Dep_name'];
+    $location = $_POST['location'];
+    $sql = "INSERT INTO department (Dep_no, Dep_name, location) VALUES ('$Dep_no', '$Dep_name', '$location')";
+    if (mysqli_query($conn, $sql)) {
+        echo "<div style='color:green;'>Record inserted successfully!</div>";
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<body>
+  <form method="post" action="">
+    <fieldset>
+      <legend>Department</legend>
+      Dept No: <input type="text" name="Dep_no"><br><br>
+      Dept Name: <input type="text" name="Dep_name"><br><br>
+      Location: <input type="text" name="location"><br><br>
+      <input type="submit" name="submit" value="Submit">
+    </fieldset>
+  </form>
+</body>
+</html>

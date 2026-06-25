@@ -1,0 +1,29 @@
+| What you want to do | Open this URL                                |
+| ------------------- | -------------------------------------------- |
+| Add a record        | http://localhost/office/forminsert.php       |
+| See all records     | http://localhost/office/fetch_department.php |
+| Edit a record       | Click Edit link from fetch page              |
+| Delete a record     | Click Delete link from fetch page            |
+| Upload image        | http://localhost/office/imageinsert.php      |
+
+
+// 1. Connect to DB (connection.php)
+$conn = mysqli_connect("localhost", "root", "", "office");
+
+// 2. Include connection in every file
+include_once 'connection.php';
+
+// 3. Insert data
+$sql = "INSERT INTO department (Dep_no, Dep_name, location)
+        VALUES ('$Dep_no', '$Dep_name', '$location')";
+mysqli_query($conn, $sql);
+
+// 4. Display data
+$result = mysqli_query($conn, "SELECT * FROM department");
+while ($row = mysqli_fetch_array($result)) {
+    echo $row['Dep_no'];
+}
+
+// 5. Delete data
+$sql = "DELETE FROM department WHERE Dep_no='$Dep_no'";
+mysqli_query($conn, $sql);
