@@ -1,0 +1,94 @@
+<?php
+include_once 'connection.php';
+
+$msg = "";
+
+// 1. PROCESS THE UPDATE (If the form was submitted)
+if (isset($_POST['update_btn'])) {
+    $d_no   = mysqli_real_escape_string($conn, $_POST['deptno']);
+    $d_name = mysqli_real_escape_string($conn, $_POST['deptname']);
+    $d_loc  = mysqli_real_escape_string($conn, $_POST['deptlocation']);
+
+    $sql = "UPDATE department 
+            SET dept_name = '$d_name', 
+                location = '$d_loc' 
+            WHERE dept_no = '$d_no'";
+
+    if (mysqli_query($conn, $sql)) {
+        $msg = "<p style='color: green;'>Record updated successfully!</p>";
+    } else {
+        $msg = "<p style='color: red;'>Error: " . mysqli_error($conn) . "</p>";
+    }
+}
+
+// 2. FETCH DATA TO FILL THE FORM
+// We need to know WHICH department to show. 
+// Usually, you pass this in the URL like: update_dept.php?deptno=D1
+$id = isset($_GET['deptno']) ? $_GET['deptno'] : ($_POST['deptno'] ?? '');
+
+$row = null;
+if ($id != '') {
+    $result = mysqli_query($conn, "SELECT * FROM department WHERE dept_no = '$id'");
+    $row = mysqli_fetch_array($result);
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Department</title>
+</head>
+<body>
+
+    <h2>Edit Department Details</h2>
+    <?php echo $msg; // Show success or error message ?>
+
+    <?php if ($row): ?>
+        <form method="POST" action="update_dept.php">
+            <p>
+                <label>Department Number (Cannot Change):</label><br>
+                <!-- We use a hidden input to send the ID back to the PHP -->
+                <input type="hidden" name="deptno" value="<?php echo $row['dept_no']; ?>">
+                <strong><?php echo $row['dept_no']; ?></strong>
+            </p>
+
+            <p>
+                <label>Department Name:</label><br>
+                <input type="text" name="deptname" value="<?php echo $row['dept_name']; ?>">
+            </p>
+
+            <p>
+                <label>Location:</label><br>
+                <input type="text" name="deptlocation" value="<?php echo $row['location']; ?>">
+            </p>
+
+            <input type="submit" name="update_btn" value="Save Changes">
+        </form>
+    <?php else: ?>
+        <p>No department selected to edit. Please provide a department number</p>
+    <?php endif; ?>
+
+<!-- Paste this inside the <body> after your form -->
+<hr>
+<h3>Current Departments</h3>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Dept No</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Action</th>
+    </tr>
+    <?php
+    $all_depts = mysqli_query($conn, "SELECT * FROM department");
+    while($row_list = mysqli_fetch_array($all_depts)) {
+        echo "<tr>";
+        echo "<td>" . $row_list['dept_no'] . "</td>";
+        echo "<td>" . $row_list['dept_name'] . "</td>";
+        echo "<td>" . $row_list['location'] . "</td>";
+        echo "<td><a href='update_dept.php?deptno=" . $row_list['dept_no'] . "'>Edit</a></td>";
+        echo "</tr>";
+    }
+    ?>
+</table>
+</body>
+</html>

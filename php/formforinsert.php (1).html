@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Department Input Form</title>
+	<style>
+    label {
+        display: inline-block;
+        width: 120px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+    <fieldset>
+        <legend>Department Information</legend>
+        <form method="POST" action="dept_insert.php">
+            
+            <p>
+                <label for="dept_no"> Department Number :</label>
+                <input type="text" name="deptno" id="deptno" placeholder="e.g. D1">
+            </p>
+
+            <p>
+                <label for="dept_name">Department Name :</label>
+                <input type="text" name="deptname" id="deptname" placeholder="e.g. Sales">
+            </p>
+
+            <p>
+                <label for="dept_location">Department Location :</label>
+                <input type="text" name="deptlocation" id="deptlocation" placeholder="e.g. New York">
+            </p>
+
+            <input type="submit" name="submit" value="Submit">
+        </form>
+    </fieldset>
+
+</body>
+</html>
